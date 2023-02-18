@@ -9,12 +9,13 @@ public class Main {
         final String operandTwo;
         final int operand1;
         final int operand2;
-
+        if (input.contains("\n"))
+            throw new NumberFormatException("Данные передны не в одну строку");
         index = indexOfOperator(input);
         operator = input.charAt(index);
-        operandOne = input.substring(0, index);
-        operandTwo = input.substring(index + 1);
-        if (operandOne.length()==0 || operandTwo.length()==0)
+        operandOne = input.substring(0, index).trim();
+        operandTwo = input.substring(index + 1).trim();
+        if (operandOne.length() == 0 || operandTwo.length() == 0)
             throw new NumberFormatException("Отсутствует один из операндов");
 
         if (checkRoman(operandOne) && checkRoman(operandTwo)) {
@@ -82,7 +83,7 @@ public class Main {
         return sum;
     }
 
-    public static String arabianToRoman(int sum) {
+    private static String arabianToRoman(int sum) {
         StringBuilder result = new StringBuilder();
         for (Roman roman : Roman.values()) {
             while (sum >= roman.toInt()) {
@@ -98,10 +99,18 @@ public class Main {
             throw new NumberFormatException("Операнды должны быть в диапазоне 1-10");
         } else {
             switch (operator) {
-                case '+' -> {return operandOne + operandTwo;}
-                case '-' -> {return operandOne - operandTwo;}
-                case '*' -> {return operandOne * operandTwo;}
-                case '/' -> {return operandOne / operandTwo;}
+                case '+' -> {
+                    return operandOne + operandTwo;
+                }
+                case '-' -> {
+                    return operandOne - operandTwo;
+                }
+                case '*' -> {
+                    return operandOne * operandTwo;
+                }
+                case '/' -> {
+                    return operandOne / operandTwo;
+                }
                 default -> throw new IllegalArgumentException("В метод передан неверный оператор");
             }
         }
