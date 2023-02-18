@@ -103,12 +103,9 @@ public class Main {
                 case '*' -> {return operandOne * operandTwo;}
                 case '/' -> {return operandOne / operandTwo;}
                 default -> throw new IllegalArgumentException("В метод передан неверный оператор");
-
             }
         }
     }
-
-
 }
 
 enum Roman {
