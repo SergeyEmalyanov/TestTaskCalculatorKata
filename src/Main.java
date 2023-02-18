@@ -2,9 +2,7 @@ import java.util.*;
 
 public class Main {
 
-
     public static String calc(String input) {
-        Converter converter = new Converter();
         final int index;
         final char operator;
         final String operandOne;
@@ -16,20 +14,22 @@ public class Main {
         operator = input.charAt(index);
         operandOne = input.substring(0, index);
         operandTwo = input.substring(index + 1);
+        if (operandOne.length()==0 || operandTwo.length()==0)
+            throw new NumberFormatException("Отсутствует один из операндов");
 
         if (checkRoman(operandOne) && checkRoman(operandTwo)) {
-            operand1 = converter.convertToArabian(operandOne);
-            operand2 = converter.convertToArabian(operandTwo);
+            operand1 = romanToArabian(operandOne);
+            operand2 = romanToArabian(operandTwo);
             int result = calculator(operand1, operand2, operator);
-            if (result > 0) return converter.convertToRoman(result);
+            if (result > 0) return arabianToRoman(result);
             else {
                 throw new NumberFormatException("Римскими цифрами может быть представлен результат больше 0");
             }
         } else {
-                operand1 = checkAndParseArabian(operandOne);
-                operand2 = checkAndParseArabian(operandTwo);
-                int result = calculator(operand1, operand2, operator);
-                return String.valueOf(result);
+            operand1 = checkAndParseArabian(operandOne);
+            operand2 = checkAndParseArabian(operandTwo);
+            int result = calculator(operand1, operand2, operator);
+            return String.valueOf(result);
         }
     }
 
@@ -39,24 +39,58 @@ public class Main {
         else if (input.contains("*")) return input.indexOf('*');
         else if (input.contains("/")) return input.indexOf('/');
         else {
-           throw new NoSuchElementException("Оператор отсутствует во входной строке");
+            throw new NoSuchElementException("Оператор отсутствует во входной строке");
         }
     }
 
     private static boolean checkRoman(String operand) {
-        boolean roman = true;
+        boolean roman;
         for (int i = 0; i < operand.length(); i++) {
-            roman = roman && (operand.charAt(i) == 'I' || operand.charAt(i) == 'V' || operand.charAt(i) == 'X');
+            roman = operand.charAt(i) == 'I' || operand.charAt(i) == 'V' || operand.charAt(i) == 'X';
+            if (!roman) {
+                return false;
+            }
         }
-        return roman;
+        if (operand.contains("V") && !(operand.indexOf('V') == operand.lastIndexOf('V')))
+            throw new NumberFormatException("В операнде может быть только одна цифра V");
+        if (operand.contains("I")) {
+            int betweenIndex = operand.lastIndexOf('I') - operand.indexOf('I');
+            if ((betweenIndex > 2) || (betweenIndex == 2) && operand.charAt(operand.indexOf('I') + 1) != 'I') {
+                throw new NumberFormatException("Ошибка записи в операнд римских цифр I");
+            }
+        }
+        return true;
     }
 
-    private static int checkAndParseArabian(String operand){
+    private static int checkAndParseArabian(String operand) {
         try {
             return Integer.parseInt(operand);
         } catch (NumberFormatException e) {
             throw new NumberFormatException("Ошибка ввода");
         }
+    }
+
+    private static int romanToArabian(String operand) {
+        int sum = 0;
+        for (Roman roman : Roman.values()) {
+            while (operand.indexOf(roman.toString()) == 0) {
+                sum += roman.toInt();
+                operand = operand.substring(roman.toString().length());
+            }
+        }
+        if (operand.length() != 0) throw new NumberFormatException("Ошибка при вводе римского числа");
+        return sum;
+    }
+
+    public static String arabianToRoman(int sum) {
+        StringBuilder result = new StringBuilder();
+        for (Roman roman : Roman.values()) {
+            while (sum >= roman.toInt()) {
+                sum -= roman.toInt();
+                result.append(roman);
+            }
+        }
+        return result.toString();
     }
 
     private static Integer calculator(int operandOne, int operandTwo, char operator) {
@@ -82,49 +116,28 @@ public class Main {
             }
         }
     }
+
+
 }
 
-class Converter {
-    final private Comparator<Integer> comparator = (o1, o2) -> o2 - o1;
-    final private Map<String, Integer> romanToArabian = new HashMap<>();
-    final private Map<Integer, String> arabianToRoman = new TreeMap<>(comparator);
+enum Roman {
+    C(100),
+    XC(90),
+    L(50),
+    XL(40),
+    X(10),
+    IX(9),
+    V(5),
+    IV(4),
+    I(1);
 
-    Converter() {
-        romanToArabian.put("I", 1);
-        romanToArabian.put("II", 2);
-        romanToArabian.put("III", 3);
-        romanToArabian.put("IV", 4);
-        romanToArabian.put("V", 5);
-        romanToArabian.put("VI", 6);
-        romanToArabian.put("VII", 7);
-        romanToArabian.put("VIII", 8);
-        romanToArabian.put("IX", 9);
-        romanToArabian.put("X", 10);
+    private final int value;
 
-        arabianToRoman.put(100, "C");
-        arabianToRoman.put(90, "XC");
-        arabianToRoman.put(50, "L");
-        arabianToRoman.put(40, "XL");
-        arabianToRoman.put(10, "X");
-        arabianToRoman.put(9, "IX");
-        arabianToRoman.put(5, "V");
-        arabianToRoman.put(4, "IV");
-        arabianToRoman.put(1, "I");
+    Roman(int value) {
+        this.value = value;
     }
 
-    int convertToArabian(String operand) {
-        if (romanToArabian.containsKey(operand)) return romanToArabian.get(operand);
-        else throw new NumberFormatException("Ошибка при вводе римского числа");
-    }
-
-    String convertToRoman(int sum) {
-        StringBuilder result = new StringBuilder();
-        for (Integer key : arabianToRoman.keySet()) {
-            while (sum >= key) {
-                sum -= key;
-                result.append(arabianToRoman.get(key));
-            }
-        }
-        return result.toString();
+    int toInt() {
+        return value;
     }
 }
