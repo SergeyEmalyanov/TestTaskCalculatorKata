@@ -93,26 +93,17 @@ public class Main {
         return result.toString();
     }
 
-    private static Integer calculator(int operandOne, int operandTwo, char operator) {
+    private static int calculator(int operandOne, int operandTwo, char operator) {
         if (operandOne <= 0 || operandOne > 10 || operandTwo <= 0 || operandTwo > 10) {
             throw new NumberFormatException("Операнды должны быть в диапазоне 1-10");
         } else {
             switch (operator) {
-                case '+' -> {
-                    return operandOne + operandTwo;
-                }
-                case '-' -> {
-                    return operandOne - operandTwo;
-                }
-                case '*' -> {
-                    return operandOne * operandTwo;
-                }
-                case '/' -> {
-                    return operandOne / operandTwo;
-                }
-                default -> {
-                    throw new IllegalArgumentException("В метод передан неверный оператор");
-                }
+                case '+' -> {return operandOne + operandTwo;}
+                case '-' -> {return operandOne - operandTwo;}
+                case '*' -> {return operandOne * operandTwo;}
+                case '/' -> {return operandOne / operandTwo;}
+                default -> throw new IllegalArgumentException("В метод передан неверный оператор");
+
             }
         }
     }
