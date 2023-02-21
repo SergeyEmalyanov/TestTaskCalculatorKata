@@ -2,6 +2,17 @@ import java.util.*;
 
 public class Main {
 
+    public static void main(String[] args) {
+        String input;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите арифметическое выражение или пробел для выхода.");
+        while (true) {
+            input = scanner.nextLine();
+            if ("".equals(input.trim())) break;
+            else System.out.println("Ответ: "+calc(input));
+        }
+    }
+
     public static String calc(String input) {
         final int index;
         final char operator;
